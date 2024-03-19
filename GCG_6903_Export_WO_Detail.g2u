@@ -1,0 +1,203 @@
+﻿Program.Sub.ScreenSU.Start
+Gui.Form..Create(BaseForm)
+Gui.Form..Caption("WO Detail Export")
+Gui.Form..Size(335,186)
+Gui.Form..MinX(0)
+Gui.Form..MinY(0)
+Gui.Form..Position(0,0)
+Gui.Form..AlwaysOnTop(False)
+Gui.Form..FontName("Tahoma")
+Gui.Form..FontSize(8.25)
+Gui.Form..ControlBox(True)
+Gui.Form..MaxButton(True)
+Gui.Form..MinButton(True)
+Gui.Form..MousePointer(0)
+Gui.Form..Moveable(True)
+Gui.Form..Sizeable(True)
+Gui.Form..ShowInTaskBar(True)
+Gui.Form..TitleBar(True)
+Gui.Form..Event(UnLoad,Form_UnLoad)
+Gui.Form.txtBegWO.Create(TextBox,"",True,100,20,0,26,41,True,0,"Tahoma",8.25,,1)
+Gui.Form.txtEndWO.Create(TextBox,"",True,100,20,0,185,42,True,0,"Tahoma",8.25,,1)
+Gui.Form.cmdExport.Create(Button)
+Gui.Form.cmdExport.Enabled(True)
+Gui.Form.cmdExport.Visible(True)
+Gui.Form.cmdExport.Zorder(0)
+Gui.Form.cmdExport.Size(75,23)
+Gui.Form.cmdExport.Position(126,104)
+Gui.Form.cmdExport.Caption("Export")
+Gui.Form.cmdExport.FontName("Tahoma")
+Gui.Form.cmdExport.FontSize(8.25)
+Gui.Form.cmdExport.Event(Click,cmdExport_Click)
+Gui.Form.cmd1.Create(Button)
+Gui.Form.cmd1.Enabled(True)
+Gui.Form.cmd1.Visible(True)
+Gui.Form.cmd1.Zorder(0)
+Gui.Form.cmd1.Size(31,23)
+Gui.Form.cmd1.Position(133,39)
+Gui.Form.cmd1.Caption("^")
+Gui.Form.cmd1.FontName("Tahoma")
+Gui.Form.cmd1.FontSize(8.25)
+Gui.Form.cmd1.Event(Click,cmd1_Click)
+Gui.Form.cmd2.Create(Button)
+Gui.Form.cmd2.Enabled(True)
+Gui.Form.cmd2.Visible(True)
+Gui.Form.cmd2.Zorder(0)
+Gui.Form.cmd2.Size(30,23)
+Gui.Form.cmd2.Position(292,40)
+Gui.Form.cmd2.Caption("^")
+Gui.Form.cmd2.FontName("Tahoma")
+Gui.Form.cmd2.FontSize(8.25)
+Gui.Form.cmd2.Event(Click,cmd2_Click)
+Gui.Form.lbl1.Create(Label,"Begining WO",True,61,13,0,27,24,True,0,"Tahoma",8.25,,0,0)
+Gui.Form.lbl1.BorderStyle(0)
+Gui.Form.lbl2.Create(Label,"Ending WO",True,53,13,0,185,25,True,0,"Tahoma",8.25,,0,0)
+Gui.Form.lbl2.BorderStyle(0)
+Gui.Form.gsgcExport.Create(GsGridControl)
+Gui.Form.gsgcExport.Enabled(True)
+Gui.Form.gsgcExport.Visible(False)
+Gui.Form.gsgcExport.Zorder(0)
+Gui.Form.gsgcExport.Size(102,72)
+Gui.Form.gsgcExport.Position(12,80)
+Program.Sub.ScreenSU.End
+'GCG 6903
+'Cus: FO Engineering
+
+' Sep 2022 - NL
+
+Program.Sub.Preflight.Start
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+Function.Intrinsic.UI.UsePixels ' Allows you to use Pixels instead of Twips throughout
+gui.Form..Visible(True)
+
+Program.Sub.Main.End
+
+Program.Sub.cmd1_Click.Start
+f.Intrinsic.Control.Try
+	v.Local.sSQL.Declare(String)
+	v.Local.sRet.Declare(String)
+	v.Local.sID.Declare(String)
+	
+	f.ODBC.Connection!Conx.OpenCompanyConnection
+		v.Local.sSQL.Set("select RTRIM(JOB)+'-'+RTRIM(SUFFIX) WORKORDER, C.NAME_CUSTOMER from V_JOB_HEADER Q left join V_CUSTOMER_MASTER C on Q.CUSTOMER = C.CUSTOMER order by WORKORDER")
+		F.Intrinsic.UI.Browser("WO", "Conx", v.Local.sSQL, "WO_NUMBER*!*CUSTOMER", "80*!*140", V.Local.sRet)
+	f.ODBC.Connection!Conx.Close
+	
+	f.Intrinsic.Control.If(v.Local.sRet,!=, "***CANCEL***")
+		f.Intrinsic.String.Split(v.Local.sRet, "*!*", v.Local.sRet)
+		v.Local.sID.Set(v.Local.sRet(0))
+		gui.Form.txtBegWO.Text(v.Local.sID)
+	f.Intrinsic.Control.EndIf
+	
+f.Intrinsic.Control.Catch
+	f.Intrinsic.UI.Msgbox(v.Ambient.ErrorDescription)
+f.Intrinsic.Control.EndTry
+Program.Sub.cmd1_Click.End
+
+Program.Sub.cmd2_Click.Start
+f.Intrinsic.Control.Try
+	v.Local.sSQL.Declare(String)
+	v.Local.sRet.Declare(String)
+	v.Local.sID.Declare(String)
+	
+	f.ODBC.Connection!Conx.OpenCompanyConnection
+		v.Local.sSQL.Set("select RTRIM(JOB)+'-'+RTRIM(SUFFIX) WORKORDER, C.NAME_CUSTOMER from V_JOB_HEADER Q left join V_CUSTOMER_MASTER C on Q.CUSTOMER = C.CUSTOMER order by WORKORDER")
+		F.Intrinsic.UI.Browser("WO", "Conx", v.Local.sSQL, "WO_NUMBER*!*CUSTOMER", "80*!*140", V.Local.sRet)
+	f.ODBC.Connection!Conx.Close
+	
+	f.Intrinsic.Control.If(v.Local.sRet,!=, "***CANCEL***")
+		f.Intrinsic.String.Split(v.Local.sRet, "*!*", v.Local.sRet)
+		v.Local.sID.Set(v.Local.sRet(0))
+		gui.Form.txtEndWO.Text(v.Local.sID)
+	f.Intrinsic.Control.EndIf
+	
+f.Intrinsic.Control.Catch
+	f.Intrinsic.UI.Msgbox(v.Ambient.ErrorDescription)
+f.Intrinsic.Control.EndTry
+Program.Sub.cmd2_Click.End
+
+Program.Sub.cmdExport_Click.Start
+f.Intrinsic.Control.Try
+	v.Local.sBegWO.Declare(String)
+	v.Local.sEndWO.Declare(String)
+	v.Local.sSQL.Declare(String)
+	v.Local.bExtention.Declare(Boolean)
+	
+	'validate
+	v.Local.sBegWO.Set(v.Screen.Form!txtBegWO.Text)
+	v.Local.sEndWO.Set(v.Screen.Form!txtEndWO.Text)
+	
+	f.Intrinsic.Control.If(v.Local.sBegWO.Trim,=,"", "OR", v.Local.sEndWO.Trim,=,"")
+		f.Intrinsic.UI.Msgbox("Please select a Beginning and an Ending WO")
+		f.Intrinsic.Control.ExitSub
+	f.Intrinsic.Control.EndIf
+	
+	f.Intrinsic.UI.InvokeWaitDialog("Preparing report...", "WO Detail Export")
+	gui.Form..Enabled(False)
+	
+	v.Local.sFile.Declare(String)
+	f.Intrinsic.UI.ShowSaveFileDialog("", "", v.Local.sFile)
+	
+	f.Intrinsic.Control.If(v.Local.sFile,!=,"***CANCEL***")
+		
+		f.Intrinsic.String.IsInString(v.Local.sFile, "xlsx", True, v.Local.bExtention)
+		f.Intrinsic.Control.If(v.Local.bExtention,=,False)
+			f.Intrinsic.String.Build("{0}.xlsx", v.Local.sFile, v.Local.sFile)
+		f.Intrinsic.Control.EndIf
+		
+		'get data and export
+		f.Intrinsic.String.Build("select RTRIM(A.JOB)+'-'+RTRIM(A.SUFFIX) WORKORDER, RTRIM(D.CUSTOMER) CUSTOMER, RTRIM(NAME_CUSTOMER) CUSTOMER_NAME, RTRIM(C.CUSTOMER_PO) CUSTOMER_PO, RTRIM(C.ROUTER) ROUTER, '_'+A.SEQUENCE SEQUENCE, RTRIM(A.PART) MATERIAL, RTRIM(B.DESCRIPTION) DESCRIPTION, A.QUANTITY*-1 QTY_ISSUED, B.UM, RTRIM(A.LOT) LOT, A.DATE_ACTION DATE_ISSUED, C.DATE_OPENED, C.DATE_DUE,  CONVERT((case when C.DATE_CLOSED > '1900-01-01' then C.DATE_CLOSED else NULL end), SQL_DATE) DATE_COMPLETE from V_ITEM_HISTORY A left join V_JOB_DETAIL B on A.JOB = B.JOB and A.SUFFIX = B.SUFFIX and A.SEQUENCE = B.SEQ left join V_JOB_HEADER C on B.JOB = C.JOB and B.SUFFIX = C.SUFFIX left join V_CUSTOMER_MASTER D on C.CUSTOMER = D.CUSTOMER where B.LMO = 'M' and A.CODE_TRANSACTION = 'J55' and WORKORDER >= '{0}'  and WORKORDER <= '{1}' order by WORKORDER, SEQUENCE, DATE_ISSUED", v.Local.sBegWO, v.Local.sEndWO, v.Local.sSQL)
+'		f.Intrinsic.String.Build("select RTRIM(A.JOB)+'-'+RTRIM(A.SUFFIX) WORKORDER, RTRIM(D.CUSTOMER) CUSTOMER, RTRIM(NAME_CUSTOMER) CUSTOMER_NAME, RTRIM(C.CUSTOMER_PO) CUSTOMER_PO, RTRIM(C.ROUTER) ROUTER, '_'+A.SEQUENCE SEQUENCE, RTRIM(A.PART) MATERIAL, RTRIM(B.DESCRIPTION) DESCRIPTION, A.QUANTITY*-1 QTY_ISSUED, B.UM, RTRIM(A.LOT) LOT, A.DATE_ACTION DATE_ISSUED, C.DATE_OPENED, C.DATE_DUE, C.DATE_CLOSED DATE_COMPLETE from V_ITEM_HISTORY A left join V_JOB_DETAIL B on A.JOB = B.JOB and A.SUFFIX = B.SUFFIX and A.SEQUENCE = B.SEQ left join V_JOB_HEADER C on B.JOB = C.JOB and B.SUFFIX = C.SUFFIX left join V_CUSTOMER_MASTER D on C.CUSTOMER = D.CUSTOMER where B.LMO = 'M' and A.CODE_TRANSACTION = 'J55' and WORKORDER >= '{0}'  and WORKORDER <= '{1}' order by WORKORDER, SEQUENCE, DATE_ISSUED", v.Local.sBegWO, v.Local.sEndWO, v.Local.sSQL)
+	
+		'connect DB
+		f.ODBC.Connection!Con.OpenCompanyConnection
+		
+		'select to DB
+		f.Intrinsic.Control.If(v.DataTable.dtMaterial.Exists)
+			f.Data.DataTable.Close
+		f.Intrinsic.Control.EndIf
+		f.Data.DataTable.CreateFromSQL("dtMaterial", "Con", v.Local.sSQL, True)
+		f.ODBC.Connection!Con.Close
+		
+		'if records exist => export
+		f.Intrinsic.Control.If(v.DataTable.dtMaterial.RowCount,>,0)
+			gui.Form.gsgcExport.AddGridviewFromDatatable("gvExport", "dtMaterial")
+			
+			gui.Form.gsgcExport.SetGridviewProperty("gvExport", v.Enum.GridViewPropertyNames!EnableAppearanceOddRow,True)
+			gui.Form.gsgcExport.SetGridviewProperty("gvExport", v.Enum.GridViewPropertyNames!SuppressNothingDates,True)
+			gui.Form.gsgcExport.SetColumnProperty("gvExport", "CUSTOMER_NAME", v.Enum.ColumnPropertyNames!Caption,"CUSTOMER NAME")
+			gui.Form.gsgcExport.SetColumnProperty("gvExport", "CUSTOMER_PO", v.Enum.ColumnPropertyNames!Caption,"CUSTOMER PO")
+			gui.Form.gsgcExport.SetColumnProperty("gvExport", "QTY_ISSUED", v.Enum.ColumnPropertyNames!Caption,"QTY ISSUED")
+			gui.Form.gsgcExport.SetColumnProperty("gvExport", "DATE_ISSUED", v.Enum.ColumnPropertyNames!Caption,"DATE ISSUED")
+			gui.Form.gsgcExport.SetColumnProperty("gvExport", "DATE_DUE", v.Enum.ColumnPropertyNames!Caption,"DATE DUE")
+			gui.Form.gsgcExport.SetColumnProperty("gvExport", "DATE_OPENED", v.Enum.ColumnPropertyNames!Caption,"DATE ORDER")
+			gui.Form.gsgcExport.SetColumnProperty("gvExport", "DATE_COMPLETE", v.Enum.ColumnPropertyNames!Caption,"DATE COMPLETE")
+			
+			gui.Form.gsgcExport.SetColumnProperty("gvExport", "WORKORDER", v.Enum.ColumnPropertyNames!MinWidth,200)
+			
+			gui.Form.gsgcExport.MainView("gvExport")
+			
+			gui.Form.gsgcExport.Export(v.Local.sFile, "xlsx")
+			F.Intrinsic.Task.ShellExec(0,"",V.Local.sFile,"","",1)
+			
+		f.Intrinsic.Control.EndIf
+	f.Intrinsic.Control.EndIf
+	
+	f.Intrinsic.UI.CloseWaitDialog
+	f.Intrinsic.Control.CallSub(Form_UnLoad)
+	
+f.Intrinsic.Control.Catch
+	f.Intrinsic.UI.Msgbox(v.Ambient.ErrorDescription)
+f.Intrinsic.Control.EndTry
+Program.Sub.cmdExport_Click.End
+
+Program.Sub.Form_UnLoad.Start
+f.Intrinsic.Control.End
+Program.Sub.Form_UnLoad.End
+
+Program.Sub.Comments.Start
+${$5$}$3.0.0.0$}$1
+${$6$}$nle$}$20220915101744146$}$kjzCRYkA6UEoRnCwndYnRYciZCm2U5XYCp6dLupzoWbBdrn84Wwp+lQresr97SNo
+Program.Sub.Comments.End
